@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IFolderRepository extends CrudRepository<DbFolder, Long> {
 
-    List<DbFolder> findByName(String name);
+  //  List<DbFolder> findByName(String name);
 }
