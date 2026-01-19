@@ -21,8 +21,7 @@ public class GetByIdNoteHandler implements IQueryHandler<Long, GetByIdNoteOutput
     
     @Override
     public GetByIdNoteOutput handle(Long input) {
-        Optional<DbNote> entity = noteRepository.findById(input)
-                .orElseThrow(() -> new NoteNotFoundException(input));
+        Optional<DbNote> entity = noteRepository.findById(input);
         
         if (entity.isPresent())
             return modelMapper.map(entity.get(), GetByIdNoteOutput.class);
