@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Note {
     private long id;
-    private String tiile;
+    private String title;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
