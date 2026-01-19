@@ -1,6 +1,10 @@
 package org.helha.aemthackatonbackend.controllers.notes;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.helha.aemthackatonbackend.application.notes.query.getalldatasfromnote.GetAllDatasFromNoteHandler;
 import org.helha.aemthackatonbackend.application.notes.query.getalldatasfromnote.GetAllDatasFromNoteOutput;
@@ -24,6 +28,13 @@ public class NoteQueryController {
     private final GetByIdNoteHandler getByIdNoteHandler;
     
     @Operation(summary = "Find all notes from a folder")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404",
+                    description = "When a folder is not found",
+                    content = @Content(schema = @Schema(implementation = org.springframework.http.ProblemDetail.class))
+            )
+    })
     @GetMapping("/{folderId}/notes")
     public ResponseEntity<GetAllNotesFromFolderOutput> getNotesByFolder(@PathVariable Long folderId) {
         GetAllNotesFromFolderOutput output = getAllNotesFromFolderHandler.handle(folderId);
@@ -31,6 +42,13 @@ public class NoteQueryController {
     }
     
     @Operation(summary = "Find all metadatas from a note")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404",
+                    description = "When a note is not found",
+                    content = @Content(schema = @Schema(implementation = org.springframework.http.ProblemDetail.class))
+            )
+    })
     @GetMapping("/notes/{noteId}/metadata")
     public ResponseEntity<GetAllDatasFromNoteOutput> getNoteMetadata(@PathVariable Long noteId) {
         GetAllDatasFromNoteOutput output = getAllDatasFromNoteHandler.handle(noteId);
@@ -38,6 +56,13 @@ public class NoteQueryController {
     }
     
     @Operation(summary = "Find a note by its ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404",
+                    description = "When a note is not found",
+                    content = @Content(schema = @Schema(implementation = org.springframework.http.ProblemDetail.class))
+            )
+    })
     @GetMapping("/notes/{noteId}")
     public ResponseEntity<GetByIdNoteOutput> getNoteById(@PathVariable Long noteId) {
         GetByIdNoteOutput output = getByIdNoteHandler.handle(noteId);

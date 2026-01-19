@@ -1,6 +1,10 @@
 package org.helha.aemthackatonbackend.controllers.folders;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.helha.aemthackatonbackend.application.folders.query.getallfromfolder.GetAllFromFolderHandler;
 import org.helha.aemthackatonbackend.application.folders.query.getallfromfolder.GetAllFromFolderOutput;
@@ -18,6 +22,13 @@ public class FolderQueryController {
     private final GetAllFromFolderHandler getAllFromFolderHandler;
     
     @Operation(summary = "Find folders and notes from a folder")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404",
+                    description = "When a folder is not found",
+                    content = @Content(schema = @Schema(implementation = org.springframework.http.ProblemDetail.class))
+            )
+    })
     @GetMapping("/folders/{folderId}/contents")
     public ResponseEntity<GetAllFromFolderOutput> getFolderContents(@PathVariable Long folderId) {
         GetAllFromFolderOutput output = getAllFromFolderHandler.handle(folderId);
