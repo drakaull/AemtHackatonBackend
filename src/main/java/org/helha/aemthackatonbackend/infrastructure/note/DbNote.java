@@ -14,6 +14,7 @@ public class DbNote {
     public long id;
     @NotBlank
     public String title;
+    public Long folderId;
     public String content;
     public long sizeBytes;
     public long lineCount;

@@ -1,7 +1,6 @@
 package org.helha.aemthackatonbackend.application.notes.query.getbyid;
 
 import org.helha.aemthackatonbackend.application.utils.IQueryHandler;
-import org.helha.aemthackatonbackend.controllers.notes.exceptions.NoteNotFoundException;
 import org.helha.aemthackatonbackend.infrastructure.note.DbNote;
 import org.helha.aemthackatonbackend.infrastructure.note.INoteRepository;
 import org.modelmapper.ModelMapper;

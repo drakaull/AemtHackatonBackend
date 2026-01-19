@@ -16,8 +16,8 @@ public class DbFolder {
     public long id;
     @NotBlank
     public String name;
-    public long parentID;
-    public LocalDateTime createdAd;
+    public long parentId;
+    public LocalDateTime createdAt;
     public LocalDateTime updatedAt;
 
 }
