@@ -19,28 +19,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/folders")
+@RequestMapping("/notes")
 @RequiredArgsConstructor
 public class NoteQueryController {
     
-    private final GetAllNotesFromFolderHandler getAllNotesFromFolderHandler;
+
     private final GetAllDatasFromNoteHandler getAllDatasFromNoteHandler;
     private final GetByIdNoteHandler getByIdNoteHandler;
-    
-    @Operation(summary = "Find all notes from a folder")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "404",
-                    description = "When a folder is not found",
-                    content = @Content(schema = @Schema(implementation = org.springframework.http.ProblemDetail.class))
-            )
-    })
-    @GetMapping("/{folderId}/notes")
-    public ResponseEntity<GetAllNotesFromFolderOutput> getNotesByFolder(@PathVariable Long folderId) {
-        GetAllNotesFromFolderOutput output = getAllNotesFromFolderHandler.handle(folderId);
-        return ResponseEntity.ok(output);
-    }
-    
+
+
     @Operation(summary = "Find all metadatas from a note")
     @ApiResponses({
             @ApiResponse(responseCode = "200"),
@@ -49,7 +36,7 @@ public class NoteQueryController {
                     content = @Content(schema = @Schema(implementation = org.springframework.http.ProblemDetail.class))
             )
     })
-    @GetMapping("/notes/{noteId}/metadata")
+    @GetMapping("/{noteId}/metadata")
     public ResponseEntity<GetAllDatasFromNoteOutput> getNoteMetadata(@PathVariable Long noteId) {
         GetAllDatasFromNoteOutput output = getAllDatasFromNoteHandler.handle(noteId);
         return ResponseEntity.ok(output);
@@ -63,7 +50,7 @@ public class NoteQueryController {
                     content = @Content(schema = @Schema(implementation = org.springframework.http.ProblemDetail.class))
             )
     })
-    @GetMapping("/notes/{noteId}")
+    @GetMapping("/{noteId}")
     public ResponseEntity<GetByIdNoteOutput> getNoteById(@PathVariable Long noteId) {
         GetByIdNoteOutput output = getByIdNoteHandler.handle(noteId);
         return ResponseEntity.ok(output);
