@@ -6,17 +6,19 @@ import lombok.RequiredArgsConstructor;
 import org.helha.aemthackatonbackend.application.notes.command.NoteCommandProcessor;
 import org.helha.aemthackatonbackend.application.notes.command.create.CreateNoteInput;
 import org.helha.aemthackatonbackend.application.notes.command.create.CreateNoteOutput;
-import org.helha.aemthackatonbackend.application.notes.command.update.UpdateNoteHandler;
 import org.helha.aemthackatonbackend.application.notes.command.update.UpdateNoteInput;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/folders")
 @RequiredArgsConstructor
 public class NoteCommandController {
 
-    private final NoteCommandProcessor processor;
+    private final NoteCommandProcessor noteCommandProcessor;
 
     @PostMapping("/{folderId}/notes")
     public ResponseEntity<CreateNoteOutput> createNote(
@@ -24,14 +26,27 @@ public class NoteCommandController {
             @Valid @RequestBody CreateNoteInput input
     ) {
         // On force le folderId depuis l'URL
-        CreateNoteInput fixedInput = new CreateNoteInput(input.getTitle(), folderId);
-        CreateNoteOutput output = processor.create(fixedInput);
-        return ResponseEntity.status(201).body(output);
+//        CreateNoteInput fixedInput = new CreateNoteInput(input.getTitle(), folderId);
+//        CreateNoteOutput output = noteCommandProcessor.create(fixedInput);
+//        return ResponseEntity.status(201).body(output);
+        CreateNoteOutput output = noteCommandProcessor.createNoteHandler.handle(input);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(output.id)
+                .toUri();
+        return ResponseEntity
+                .created(location)
+                .body(output);
     }
 
     @PutMapping("/{noteId}")
     public ResponseEntity<Void> updateNote(@PathVariable Long noteId, @Valid @RequestBody UpdateNoteInput input) {
-        updateNoteHandler.handle(noteId, input);
-        return ResponseEntity.noContent().build();
+        try {
+            noteCommandProcessor.updateNoteHandler.handle(noteId, input);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

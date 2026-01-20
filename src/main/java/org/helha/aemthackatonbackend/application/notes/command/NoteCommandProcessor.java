@@ -2,21 +2,17 @@
 package org.helha.aemthackatonbackend.application.notes.command;
 
 import org.helha.aemthackatonbackend.application.notes.command.create.CreateNoteHandler;
-import org.helha.aemthackatonbackend.application.notes.command.create.CreateNoteInput;
-import org.helha.aemthackatonbackend.application.notes.command.create.CreateNoteOutput;
+import org.helha.aemthackatonbackend.application.notes.command.update.UpdateNoteHandler;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NoteCommandProcessor {
 
-    private final CreateNoteHandler createNoteHandler;
+    public final CreateNoteHandler createNoteHandler;
+    public final UpdateNoteHandler updateNoteHandler;
 
-    public NoteCommandProcessor(CreateNoteHandler createNoteHandler) {
+    public NoteCommandProcessor(CreateNoteHandler createNoteHandler, UpdateNoteHandler updateNoteHandler, UpdateNoteHandler updateNoteHandler1) {
         this.createNoteHandler = createNoteHandler;
+        this.updateNoteHandler = updateNoteHandler1;
     }
-
-    public CreateNoteOutput create(CreateNoteInput input) {
-        return createNoteHandler.handle(input);
-    }
-
 }
