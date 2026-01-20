@@ -11,15 +11,22 @@ import java.time.LocalDateTime;
 public class DbNote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
-    @NotBlank
-    public String title;
-    public Long folderId;
-    public String content;
-    public long sizeBytes;
-    public long lineCount;
-    public long wordCount;
-    public long charCount;
-    public LocalDateTime createdAt;
-    public LocalDateTime updatedAt;
+    private Long id;
+
+    @Column(nullable = false)
+    private Long folderId;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String content;
+
+    private Long sizeBytes;
+    private Long lineCount;
+    private Long wordCount;
+    private Long charCount;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
