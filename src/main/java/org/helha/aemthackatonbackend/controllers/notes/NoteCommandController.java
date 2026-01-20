@@ -12,10 +12,12 @@ import org.helha.aemthackatonbackend.application.notes.command.NoteCommandProces
 import org.helha.aemthackatonbackend.application.notes.command.create.CreateNoteInput;
 import org.helha.aemthackatonbackend.application.notes.command.create.CreateNoteOutput;
 import org.helha.aemthackatonbackend.application.notes.command.update.UpdateNoteInput;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 
 @RestController
@@ -82,5 +84,19 @@ public class NoteCommandController {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+    
+    
+    @GetMapping("/notes/{noteId}/export/pdf")
+    public ResponseEntity<byte[]> exportNoteToPdf(
+            @PathVariable Long noteId,
+            @RequestParam(defaultValue = "false") boolean includeMetadata
+    ) throws IOException {
+        byte[] pdfBytes = noteCommandProcessor.exportNoteToPdfHandler.handle(noteId, includeMetadata);
+        
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=note-" + noteId + ".pdf")
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
     }
 }
