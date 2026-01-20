@@ -2,12 +2,15 @@ package org.helha.aemthackatonbackend.infrastructure.note;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name="notes")
-
+@Data
+@NoArgsConstructor
 public class DbNote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
