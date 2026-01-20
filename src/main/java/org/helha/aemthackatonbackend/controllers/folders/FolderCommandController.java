@@ -12,19 +12,29 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/folders")
 @RequiredArgsConstructor
 public class FolderCommandController {
-
+    
     private final FolderCommandProcessor folderCommandProcessor;
-
+    
     @PostMapping("/{parentId}")
     public ResponseEntity<CreateFolderOutput> createFolder(
             @PathVariable Long parentId,
             @Valid @RequestBody CreateFolderInput input
-            ){
+    ) {
         CreateFolderInput fixedInput = new CreateFolderInput(
                 input.getName(),
                 parentId
         );
         CreateFolderOutput output = folderCommandProcessor.createFolder(fixedInput);
         return ResponseEntity.status(201).body(output);
+    }
+    
+    @DeleteMapping("/{folderId}")
+    public ResponseEntity<Void> deleteFolder(@PathVariable Long folderId) {
+        try {
+            folderCommandProcessor.deleteFolderHandler.handle(folderId);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

@@ -4,14 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.helha.aemthackatonbackend.application.folders.command.create.CreateFolderHandler;
 import org.helha.aemthackatonbackend.application.folders.command.create.CreateFolderInput;
 import org.helha.aemthackatonbackend.application.folders.command.create.CreateFolderOutput;
+import org.helha.aemthackatonbackend.application.folders.command.delete.DeleteFolderHandler;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class FolderCommandProcessor {
     public final CreateFolderHandler createFolderHandler;
+    public final DeleteFolderHandler deleteFolderHandler;
 
-    public CreateFolderOutput createFolder(CreateFolderInput input){
+    public CreateFolderOutput createFolder(CreateFolderInput input) {
         return createFolderHandler.handle(input);
     }
 }
