@@ -8,4 +8,5 @@ public interface INoteRepository extends CrudRepository<DbNote, Long> {
     
     //    List<DbNote> findByName(String name);
     List<DbNote> findByFolderId(Long folderId);
+    
 }
