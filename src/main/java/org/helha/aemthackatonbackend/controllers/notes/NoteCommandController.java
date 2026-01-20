@@ -19,7 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/folders")
+@RequestMapping("/notes")
 @RequiredArgsConstructor
 public class NoteCommandController {
     
@@ -74,7 +74,7 @@ public class NoteCommandController {
             @ApiResponse(responseCode = "404",
                     content = @Content(schema = @Schema(implementation = org.springframework.http.ProblemDetail.class)))
     })
-    @DeleteMapping("/notes/{noteId}")
+    @DeleteMapping("/{noteId}")
     public ResponseEntity<Void> deleteNote(@PathVariable Long noteId) {
         try {
             noteCommandProcessor.deleteNoteHandler.handle(noteId);
