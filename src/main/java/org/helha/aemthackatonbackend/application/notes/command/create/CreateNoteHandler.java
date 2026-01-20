@@ -32,16 +32,16 @@ public class CreateNoteHandler {
     public CreateNoteOutput handle(@Valid CreateNoteInput input) {
 
         // 1) Vérifier que le dossier existe
-        if (!folderRepository.existsById(input.folderId)) {
-            throw new EntityNotFoundException("Le dossier " + input.folderId + " n'existe pas.");
+        if (!folderRepository.existsById(input.getFolderId())) {
+            throw new EntityNotFoundException("Le dossier " + input.getFolderId() + " n'existe pas.");
         }
 
         // 2) Construire la note
         String content = ""; // contenu vide par défaut
 
         DbNote entity = new DbNote();
-        entity.setFolderId(input.folderId);
-        entity.setTitle(input.title.trim());
+        entity.setFolderId(input.getFolderId());
+        entity.setTitle(input.getTitle().trim());
         entity.setContent(content);
 
         // 3) Métadonnées
