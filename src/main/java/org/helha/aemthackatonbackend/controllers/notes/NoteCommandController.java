@@ -41,9 +41,6 @@ public class NoteCommandController {
             @Valid @RequestBody CreateNoteInput input
     ) {
         // On force le folderId depuis l'URL
-//        CreateNoteInput fixedInput = new CreateNoteInput(input.getTitle(), folderId);
-//        CreateNoteOutput output = noteCommandProcessor.create(fixedInput);
-//        return ResponseEntity.status(201).body(output);
         CreateNoteOutput output = noteCommandProcessor.createNoteHandler.handle(input);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
