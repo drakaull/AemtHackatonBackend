@@ -1,7 +1,14 @@
 package org.helha.aemthackatonbackend.application.notes.command.create;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateNoteOutput {
     public Long id;
     public Long folderId;
@@ -14,15 +21,4 @@ public class CreateNoteOutput {
     public LocalDateTime createdAt;
     public LocalDateTime updatedAt;
 
-    public CreateNoteOutput(Long id,
-                            Long folderId,
-                            String title,
-                            String content,
-                            Long sizeBytes,
-                            Long lineCount,
-                            Long wordCount,
-                            Long charCount,
-                            LocalDateTime createdAt,
-                            LocalDateTime updatedAt)
-    {}
 }
