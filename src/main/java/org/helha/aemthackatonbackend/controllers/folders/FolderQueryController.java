@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class FolderQueryController {
     
-    private final GetAllFromFolderHandler getAllFromFolderHandler;
     private final GetAllNotesFromFolderHandler getAllNotesFromFolderHandler;
+    private final GetAllFromFolderHandler getAllFromFolderHandler;
     
     @Operation(summary = "Find folders and notes from a folder")
     @ApiResponses({
@@ -37,7 +37,7 @@ public class FolderQueryController {
         GetAllFromFolderOutput output = getAllFromFolderHandler.handle(folderId);
         return ResponseEntity.ok(output);
     }
-
+    
     @Operation(summary = "Find all notes from a folder")
     @ApiResponses({
             @ApiResponse(responseCode = "200"),
@@ -51,5 +51,5 @@ public class FolderQueryController {
         GetAllNotesFromFolderOutput output = getAllNotesFromFolderHandler.handle(folderId);
         return ResponseEntity.ok(output);
     }
-
+    
 }

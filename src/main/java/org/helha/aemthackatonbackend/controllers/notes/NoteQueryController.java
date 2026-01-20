@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NoteQueryController {
     
-
     private final GetAllDatasFromNoteHandler getAllDatasFromNoteHandler;
     private final GetByIdNoteHandler getByIdNoteHandler;
-
-
+    
+    
+    
     @Operation(summary = "Find all metadatas from a note")
     @ApiResponses({
             @ApiResponse(responseCode = "200"),
