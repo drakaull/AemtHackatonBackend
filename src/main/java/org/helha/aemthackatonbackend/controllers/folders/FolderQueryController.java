@@ -11,6 +11,7 @@ import org.helha.aemthackatonbackend.application.folders.query.FolderQueryProces
 import org.helha.aemthackatonbackend.application.folders.query.export.FolderExportNode;
 import org.helha.aemthackatonbackend.application.folders.query.getallfromfolder.GetAllFromFolderHandler;
 import org.helha.aemthackatonbackend.application.folders.query.getallfromfolder.GetAllFromFolderOutput;
+import org.helha.aemthackatonbackend.application.folders.query.getfolderbyid.GetFolderByIdOutput;
 import org.helha.aemthackatonbackend.application.notes.query.getallnotesfromfolder.GetAllNotesFromFolderHandler;
 import org.helha.aemthackatonbackend.application.notes.query.getallnotesfromfolder.GetAllNotesFromFolderOutput;
 import org.helha.aemthackatonbackend.application.utils.ZipFolderUtils;
@@ -60,23 +61,34 @@ public class FolderQueryController {
         GetAllNotesFromFolderOutput output = getAllNotesFromFolderHandler.handle(folderId);
         return ResponseEntity.ok(output);
     }
-
-    @Operation (summary = "Exporter un fichier en ZIP")
-
+    
+    @Operation(summary = "Export a folder as an archive")
     @GetMapping(value = "/{folderId}/export", produces = "application/zip")
     public ResponseEntity<byte[]> exportFolder(@PathVariable Long folderId) throws IOException {
-
+        
         FolderExportNode tree = folderQueryProcessor.exportNode(folderId);
         byte[] zip = ZipFolderUtils.zipFolder(tree);
-
+        
         // Nom de fichier : <nom-du-dossier>.zip
         String safeName = URLEncoder.encode(tree.getName() + ".zip", StandardCharsets.UTF_8);
-
+        
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename*=UTF-8''" + safeName)
                 .header("Content-Type", "application/zip")
                 .body(zip);
     }
-
-
+    
+    @Operation(summary = "Find a folder by its ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404",
+                    description = "When a folder is not found",
+                    content = @Content(schema = @Schema(implementation = org.springframework.http.ProblemDetail.class))
+            )
+    })
+    @GetMapping("/{folderId}")
+    public ResponseEntity<GetFolderByIdOutput> getFolderById(@PathVariable Long folderId) {
+        GetFolderByIdOutput output = folderQueryProcessor.getFolderByIdHandler.handle(folderId);
+        return ResponseEntity.ok(output);
+    }
 }
