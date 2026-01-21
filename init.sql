@@ -209,3 +209,6 @@ VALUES (@hackathon_id,
         'Texte...',
         1024, 12, 180, 980,
         NOW(), NOW());
+
+DROP TRIGGER IF EXISTS trg_notes_prevent_super_root_insert;
+DROP TRIGGER IF EXISTS trg_notes_prevent_super_root_update;
