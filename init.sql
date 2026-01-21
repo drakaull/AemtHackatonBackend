@@ -99,37 +99,37 @@ VALUES (1, @super_id);
 COMMIT;
 
 
--- 5) TRIGGERS pour faire respecter les règles métier
+-- -- 5) TRIGGERS pour faire respecter les règles métier
+--
+-- DELIMITER $$
+--
+-- -- a) Empêcher la création d’une NOTE dans le Super Dossier
+-- CREATE TRIGGER trg_notes_prevent_super_root_insert
+--     BEFORE INSERT
+--     ON notes
+--     FOR EACH ROW
+-- BEGIN
+--     DECLARE super_id BIGINT UNSIGNED;
+--     SELECT super_root_folder_id INTO super_id FROM app_settings WHERE id = 1;
+--     IF NEW.folder_id = super_id THEN
+--         SIGNAL SQLSTATE '45000'
+--             SET MESSAGE_TEXT = 'Impossible de créer une note dans le Super Dossier.';
+--     END IF;
+-- END$$
 
-DELIMITER $$
-
--- a) Empêcher la création d’une NOTE dans le Super Dossier
-CREATE TRIGGER trg_notes_prevent_super_root_insert
-    BEFORE INSERT
-    ON notes
-    FOR EACH ROW
-BEGIN
-    DECLARE super_id BIGINT UNSIGNED;
-    SELECT super_root_folder_id INTO super_id FROM app_settings WHERE id = 1;
-    IF NEW.folder_id = super_id THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Impossible de créer une note dans le Super Dossier.';
-    END IF;
-END$$
-
-CREATE TRIGGER trg_notes_prevent_super_root_update
-    BEFORE UPDATE
-    ON notes
-    FOR EACH ROW
-BEGIN
-    DECLARE super_id BIGINT UNSIGNED;
-    SELECT super_root_folder_id INTO super_id FROM app_settings WHERE id = 1;
-    IF NEW.folder_id = super_id THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Impossible de déplacer une note vers le Super Dossier.';
-    END IF;
-END$$
-
+-- CREATE TRIGGER trg_notes_prevent_super_root_update
+--     BEFORE UPDATE
+--     ON notes
+--     FOR EACH ROW
+-- BEGIN
+--     DECLARE super_id BIGINT UNSIGNED;
+--     SELECT super_root_folder_id INTO super_id FROM app_settings WHERE id = 1;
+--     IF NEW.folder_id = super_id THEN
+--         SIGNAL SQLSTATE '45000'
+--             SET MESSAGE_TEXT = 'Impossible de déplacer une note vers le Super Dossier.';
+--     END IF;
+-- END$$
+--
 
 -- b) Garantir qu’un seul dossier est "root réel" (parent_id IS NULL) et que c’est le Super Dossier
 -- (i) À l’INSERT : si parent_id IS NULL, l'id doit être celui stocké dans app_settings (mais à l'insert, l'id est AUTO_INCREMENT, donc on contrôle plutôt que personne d'autre ne soit NULL)
@@ -209,6 +209,3 @@ VALUES (@hackathon_id,
         'Texte...',
         1024, 12, 180, 980,
         NOW(), NOW());
-
-DROP TRIGGER IF EXISTS trg_notes_prevent_super_root_insert;
-DROP TRIGGER IF EXISTS trg_notes_prevent_super_root_update;
