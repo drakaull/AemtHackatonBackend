@@ -1,3 +1,4 @@
+
 package org.helha.aemthackatonbackend.domain.utils;
 
 import org.commonmark.node.Node;
@@ -9,141 +10,183 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class responsible for computing metadata related to note content.
+ * All calculations are based on the "visible" text rendered from Markdown,
+ * not on the raw Markdown syntax.
+ */
 @Component
 public class MetadataCalculator {
-    
-    private static final Parser MARKDOWN_PARSER = Parser.builder().build();
-    private static final TextContentRenderer TEXT_RENDERER = TextContentRenderer.builder().build();
-    
-    // Supprime la destination des liens markdown : [label](url) => label
-    private static final Pattern MD_LINK = Pattern.compile("\\[([^\\]]*)\\]\\(([^)]+)\\)");
-    // Supprime la destination des images markdown : ![alt](url) => alt
-    private static final Pattern MD_IMAGE = Pattern.compile("!\\[([^\\]]*)\\]\\(([^)]+)\\)");
-    
-    // Mots visibles : séquences lettres/chiffres (Unicode)
-    private static final Pattern WORD_PATTERN = Pattern.compile("[\\p{L}\\p{N}]+");
-    // Caractères visibles utiles : lettres/chiffres (Unicode)
-    private static final Pattern CHAR_PATTERN = Pattern.compile("[\\p{L}\\p{N}]");
-    
+
+    private static final Parser MARKDOWN_PARSER =
+            Parser.builder().build();
+
+    private static final TextContentRenderer TEXT_RENDERER =
+            TextContentRenderer.builder().build();
+
     /**
-     * Retire les URLs des syntaxes markdown non rendues telles quelles (liens, images).
-     * Exemple : [lien](https://google.com) => lien
+     * Removes Markdown link destinations: url -> label.
+     */
+    private static final Pattern MD_LINK =
+            Pattern.compile("\\[(\\[^\\]]*)\\]\\(([^)]+)\\)");
+
+    /**
+     * Removes Markdown image destinations: ![alt](url) -> alt.
+     */
+    private static final Pattern MD_IMAGE =
+            Pattern.compile("!\\[(\\[^\\]]*)\\]\\(([^)]+)\\)");
+
+    /**
+     * Matches visible words (letter and digit sequences, Unicode aware).
+     */
+    private static final Pattern WORD_PATTERN =
+            Pattern.compile("[\\p{L}\\p{N}]+");
+
+    /**
+     * Matches visible characters (letters and digits only).
+     */
+    private static final Pattern CHAR_PATTERN =
+            Pattern.compile("[\\p{L}\\p{N}]");
+
+    /**
+     * Removes non-visible parts of Markdown syntax (URLs in links and images).
+     * Example: [link](https://example.com) -> link
      */
     private static String stripMarkdownNonVisibleParts(String markdown) {
-        if (markdown == null || markdown.isBlank()) return "";
-        
-        // Images d'abord (pour éviter de matcher dedans avec la regex des liens)
-        String s = MD_IMAGE.matcher(markdown).replaceAll("$1");
-        // Puis liens
-        s = MD_LINK.matcher(s).replaceAll("$1");
-        
-        return s;
-    }
-    
-    /**
-     * Markdown -> texte "visible" (sans syntaxe markdown).
-     * Conserve des retours à la ligne logiques (paragraphes, listes, titres, etc.).
-     */
-    private static String markdownToPlainTextWithNewlines(String markdown) {
+
         if (markdown == null || markdown.isBlank()) {
             return "";
         }
-        
-        // IMPORTANT : enlever les parties non visibles (URL des liens/images)
+
+        // Remove image URLs first to avoid matching them with link regex
+        String s = MD_IMAGE.matcher(markdown).replaceAll("$1");
+
+        // Then remove link URLs
+        s = MD_LINK.matcher(s).replaceAll("$1");
+
+        return s;
+    }
+
+    /**
+     * Converts Markdown content to visible plain text while preserving
+     * logical line breaks (paragraphs, lists, headings).
+     */
+    private static String markdownToPlainTextWithNewlines(String markdown) {
+
+        if (markdown == null || markdown.isBlank()) {
+            return "";
+        }
+
+        // Important: remove non-visible Markdown parts first
         String sanitized = stripMarkdownNonVisibleParts(markdown);
-        
+
         Node document = MARKDOWN_PARSER.parse(sanitized);
         String text = TEXT_RENDERER.render(document);
-        
-        // Normalisation des retours à la ligne
-        text = text.replace("\r\n", "\n").replace("\r", "\n");
-        
-        // Nettoyage léger : supprimer espaces en fin de ligne
-        text = text.replaceAll("[ \t]+\n", "\n");
-        
+
+        // Normalize line endings
+        text = text.replace("\r\n", "\n")
+                .replace("\r", "\n");
+
+        // Remove trailing spaces before line breaks
+        text = text.replaceAll("[ \t]+\\n", "\n");
+
         return text;
     }
-    
+
     /**
-     * Markdown -> texte "visible" mono-ligne (retours remplacés par espaces)
+     * Converts Markdown to a single-line visible text representation.
+     * Line breaks are replaced by spaces.
      */
     private static String markdownToPlainTextSingleLine(String markdown) {
+
         String t = markdownToPlainTextWithNewlines(markdown);
-        if (t == null || t.isBlank()) return "";
+        if (t == null || t.isBlank()) {
+            return "";
+        }
+
         return t.replace('\n', ' ')
                 .replaceAll("\\s+", " ")
                 .trim();
     }
-    
+
     /**
-     * Taille en bytes en UTF-8 (basée sur le texte visible)
+     * Computes the size in bytes (UTF-8) of the visible text.
      */
     public static long computeSizeBytes(String content) {
-        String visible = markdownToPlainTextWithNewlines(content).trim();
-        return visible.getBytes(StandardCharsets.UTF_8).length;
+
+        String visible =
+                markdownToPlainTextWithNewlines(content).trim();
+
+        return visible
+                .getBytes(StandardCharsets.UTF_8)
+                .length;
     }
-    
+
     /**
-     * Nombre de lignes logique :
-     * - Si 0 caractère visible => 1 ligne
-     * - Sinon => compter les lignes sans compter une ligne vide finale artificielle
+     * Computes the logical line count.
+     * - Empty visible content counts as 1 line
+     * - Trailing artificial empty lines are ignored
      */
     public static int computeLineCount(String content) {
+
         String visible = markdownToPlainTextWithNewlines(content);
-        
+
         if (visible == null || visible.trim().isEmpty()) {
             return 1;
         }
-        
-        // Enlever uniquement les retours à la ligne de fin (évite +1 ligne vide)
-        String withoutTrailingNewlines = visible.replaceAll("\\n+$", "");
-        
+
+        // Remove only trailing line breaks to avoid counting empty lines
+        String withoutTrailingNewlines =
+                visible.replaceAll("\\n+$", "");
+
         if (withoutTrailingNewlines.trim().isEmpty()) {
             return 1;
         }
-        
+
         return withoutTrailingNewlines.split("\\n").length;
     }
-    
+
     /**
-     * Nombre de mots "visibles utiles" :
-     * on compte uniquement les séquences de lettres/chiffres.
-     * Exemple : "# a\nb\nc" => mots = a, b, c => 3
-     * Exemple : "[lien](https://google.com)" => mots = lien => 1
+     * Computes the number of visible words.
+     * Only sequences of letters and digits are counted.
      */
     public static int computeWordCount(String content) {
-        String visible = markdownToPlainTextSingleLine(content);
-        
+
+        String visible =
+                markdownToPlainTextSingleLine(content);
+
         if (visible.isBlank()) {
             return 0;
         }
-        
+
         int count = 0;
         Matcher m = WORD_PATTERN.matcher(visible);
         while (m.find()) {
             count++;
         }
+
         return count;
     }
-    
+
     /**
-     * Nombre de caractères "visibles utiles" :
-     * on compte uniquement les lettres/chiffres (pas espaces, retours, ponctuation, syntaxe markdown, URL cachée).
-     * Exemple : "# a\nb\nc" => caractères = a, b, c => 3
-     * Exemple : "[lien](https://google.com)" => caractères = l,i,e,n => 4
+     * Computes the number of visible characters.
+     * Only letters and digits are counted (no whitespace or punctuation).
      */
     public static int computeCharCount(String content) {
-        String visible = markdownToPlainTextWithNewlines(content);
-        
+
+        String visible =
+                markdownToPlainTextWithNewlines(content);
+
         if (visible == null || visible.trim().isEmpty()) {
             return 0;
         }
-        
+
         int count = 0;
         Matcher m = CHAR_PATTERN.matcher(visible);
         while (m.find()) {
             count++;
         }
+
         return count;
     }
 }
