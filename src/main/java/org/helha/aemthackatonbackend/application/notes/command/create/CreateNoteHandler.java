@@ -1,3 +1,4 @@
+
 package org.helha.aemthackatonbackend.application.notes.command.create;
 
 import org.helha.aemthackatonbackend.domain.utils.MetadataCalculator;
@@ -12,9 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+
 import org.helha.aemthackatonbackend.domain.utils.UniqueNameResolver;
 
-
+/**
+ * Application service responsible for creating notes.
+ * This handler initializes metadata, validates folder existence
+ * and ensures title uniqueness within a folder.
+ */
 @Service
 public class CreateNoteHandler {
 
@@ -22,47 +28,79 @@ public class CreateNoteHandler {
     private final IFolderRepository folderRepository;
     private final MetadataCalculator metadataCalculator;
     private final UniqueNameResolver uniqueNameResolver;
-    
-    public CreateNoteHandler(INoteRepository noteRepository,
-                             IFolderRepository folderRepository,
-                             MetadataCalculator metadataCalculator, UniqueNameResolver uniqueNameResolver) {
+
+    /**
+     * Explicit constructor used for dependency injection.
+     */
+    public CreateNoteHandler(
+            INoteRepository noteRepository,
+            IFolderRepository folderRepository,
+            MetadataCalculator metadataCalculator,
+            UniqueNameResolver uniqueNameResolver
+    ) {
         this.noteRepository = noteRepository;
         this.folderRepository = folderRepository;
         this.metadataCalculator = metadataCalculator;
         this.uniqueNameResolver = uniqueNameResolver;
     }
 
+    /**
+     * Handles the create note use case.
+     * The operation is transactional to guarantee consistency.
+     *
+     * @param input command object containing note creation data
+     * @return output DTO representing the created note
+     */
     @Transactional
     public CreateNoteOutput handle(@Valid CreateNoteInput input) {
 
-        // 1) Vérifier que le dossier existe
+        // Ensure the target folder exists before creating the note
         if (!folderRepository.existsById(input.getFolderId())) {
-            throw new EntityNotFoundException("Le dossier " + input.getFolderId() + " n'existe pas.");
+            throw new EntityNotFoundException(
+                    "Le dossier " + input.getFolderId() + " n'existe pas."
+            );
         }
 
-        // 2) Construire la note
-        String content = ""; // contenu vide par défaut
+        // Initialize note content as empty by default
+        String content = "";
 
+        // Create and populate the note entity
         DbNote entity = new DbNote();
         entity.setFolderId(input.getFolderId());
-        entity.setTitle(uniqueNameResolver.uniqueNoteTitle(input.getFolderId(), input.getTitle()));
+
+        // Resolve a unique title within the folder
+        entity.setTitle(
+                uniqueNameResolver.uniqueNoteTitle(
+                        input.getFolderId(),
+                        input.getTitle()
+                )
+        );
+
         entity.setContent(content);
 
-        // 3) Métadonnées
-        entity.setSizeBytes(metadataCalculator.computeSizeBytes(content));
-        entity.setLineCount((long) metadataCalculator.computeLineCount(content));
-        entity.setWordCount((long) metadataCalculator.computeWordCount(content));
-        entity.setCharCount((long) metadataCalculator.computeCharCount(content));
+        // Compute metadata based on the initial content
+        entity.setSizeBytes(
+                metadataCalculator.computeSizeBytes(content)
+        );
+        entity.setLineCount(
+                (long) metadataCalculator.computeLineCount(content)
+        );
+        entity.setWordCount(
+                (long) metadataCalculator.computeWordCount(content)
+        );
+        entity.setCharCount(
+                (long) metadataCalculator.computeCharCount(content)
+        );
 
-        // 4) Dates
+        // Set creation and update timestamps
         LocalDateTime now = LocalDateTime.now();
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
 
-        // 5) Save
+        // Persist the note
         DbNote saved = noteRepository.save(entity);
 
-        // 6) Output
+        // Map the persisted entity to an output DTO
         return new CreateNoteOutput(
                 saved.getId(),
                 saved.getFolderId(),
@@ -77,4 +115,3 @@ public class CreateNoteHandler {
         );
     }
 }
-
