@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS notes
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     folder_id  BIGINT UNSIGNED NOT NULL,
     title      VARCHAR(255)    NOT NULL,
-    content    MEDIUMTEXT      NOT NULL,
+    content    MEDIUMTEXT,
 
     -- métadonnées calculées côté client :
     size_bytes BIGINT UNSIGNED NOT NULL,
