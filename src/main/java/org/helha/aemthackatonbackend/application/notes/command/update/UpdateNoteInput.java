@@ -6,8 +6,7 @@ public class UpdateNoteInput {
     
     @NotBlank
     public String title;
-    
-    @NotBlank
+
     public String content;
     
 }
