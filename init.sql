@@ -1,6 +1,6 @@
 -- 1) Schéma de base de données (optionnel)
--- CREATE DATABASE IF NOT EXISTS hackaton CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
--- USE hackaton;
+CREATE DATABASE IF NOT EXISTS hackaton CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE hackaton;
 
 -- =====================================================================================
 -- Nettoyage optionnel (à activer si vous voulez repartir de zéro à chaque init)
