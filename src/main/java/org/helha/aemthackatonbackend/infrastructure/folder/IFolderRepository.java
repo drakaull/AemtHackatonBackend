@@ -8,4 +8,8 @@ public interface IFolderRepository extends CrudRepository<DbFolder, Long> {
     
     //  List<DbFolder> findByName(String name);
     List<DbFolder> findByParentId(Long parentId);
+    
+    boolean existsByParentIdAndNameIgnoreCase(Long parentId, String name);
+    
+    boolean existsByParentIdAndNameIgnoreCaseAndIdNot(Long parentId, String name, Long id);
 }

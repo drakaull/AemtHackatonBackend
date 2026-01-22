@@ -8,13 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import org.helha.aemthackatonbackend.domain.utils.UniqueNameResolver;
+
 
 @Service
 @RequiredArgsConstructor
 public class CreateFolderHandler {
 
     private final IFolderRepository folderRepository;
-
+    private final UniqueNameResolver uniqueNameResolver;
+    
     @Transactional
     public CreateFolderOutput handle(CreateFolderInput input){
         if(!folderRepository.existsById(input.getParentId())){
@@ -22,7 +25,7 @@ public class CreateFolderHandler {
         }
 
         DbFolder entity = new DbFolder();
-        entity.setName(input.getName().trim());
+        entity.setName(uniqueNameResolver.uniqueFolderName(input.getParentId(), input.getName()));
         entity.setParentId(input.getParentId());
 
         LocalDateTime now = LocalDateTime.now();
