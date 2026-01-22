@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import org.helha.aemthackatonbackend.domain.utils.UniqueNameResolver;
+
 
 @Service
 public class CreateNoteHandler {
@@ -19,13 +21,15 @@ public class CreateNoteHandler {
     private final INoteRepository noteRepository;
     private final IFolderRepository folderRepository;
     private final MetadataCalculator metadataCalculator;
-
+    private final UniqueNameResolver uniqueNameResolver;
+    
     public CreateNoteHandler(INoteRepository noteRepository,
                              IFolderRepository folderRepository,
-                             MetadataCalculator metadataCalculator) {
+                             MetadataCalculator metadataCalculator, UniqueNameResolver uniqueNameResolver) {
         this.noteRepository = noteRepository;
         this.folderRepository = folderRepository;
         this.metadataCalculator = metadataCalculator;
+        this.uniqueNameResolver = uniqueNameResolver;
     }
 
     @Transactional
@@ -41,7 +45,7 @@ public class CreateNoteHandler {
 
         DbNote entity = new DbNote();
         entity.setFolderId(input.getFolderId());
-        entity.setTitle(input.getTitle().trim());
+        entity.setTitle(uniqueNameResolver.uniqueNoteTitle(input.getFolderId(), input.getTitle()));
         entity.setContent(content);
 
         // 3) Métadonnées
