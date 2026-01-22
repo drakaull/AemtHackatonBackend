@@ -14,13 +14,18 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class DbFolder {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public long id;
+    
     @NotBlank
     public String name;
-    public long parentId;
+    
+    @Column(name = "parent_id")
+    public Long parentId;
+    
     public LocalDateTime createdAt;
     public LocalDateTime updatedAt;
-
 }
+
