@@ -1,7 +1,6 @@
 
 package org.helha.aemthackatonbackend.application.notes.command.update;
 
-import org.helha.aemthackatonbackend.application.utils.IEffectCommandHandler;
 import org.helha.aemthackatonbackend.domain.utils.MetadataCalculator;
 import org.helha.aemthackatonbackend.infrastructure.note.DbNote;
 import org.helha.aemthackatonbackend.infrastructure.note.INoteRepository;
